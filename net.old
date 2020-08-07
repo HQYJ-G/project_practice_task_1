@@ -1,0 +1,187 @@
+#include "net.h"
+
+/*
+ * function:    创建套接子
+ * @param [ in] NULL
+ * @param [out] NULL
+ * @return      套接子描述符
+ */
+
+int NET::socket_init(void){
+	int serfd;
+
+	if((serfd = socket(AF_INET,SOCK_STREAM,0)) == -1){
+		printf("socket failed\n");
+		return -1;
+	}
+	
+	int n = 1;
+	setsockopt(serfd,SOL_SOCKET, SO_REUSEADDR,&n,sizeof(int));
+
+	return serfd;
+}
+
+/*
+ * function:    套接子地址绑定
+ * @param [ in] 套接字描述符，ip,端口号
+ * @param [out] NULL
+ * @return      0
+ */
+
+int NET::bind_init(int fd, char *ip,char * port){
+	struct sockaddr_in servaddr;
+	bzero(&servaddr,0);
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(atoi(port));
+	servaddr.sin_addr.s_addr = inet_addr(ip);
+
+	if(bind(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) != 0){
+		perror("bind failed\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+/*
+ * function:    套接子地址绑定
+ * @param [ in] 套接字描述符，ip,端口号
+ * @param [out] NULL
+ * @return      0
+ */
+
+int NET::cbind_init(int fd, char *ip,char * port){
+	struct sockaddr_in servaddr;
+	bzero(&servaddr,0);
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(atoi(port));
+	servaddr.sin_addr.s_addr = inet_addr(ip);
+
+
+	return 0;
+}
+
+/*
+ * function:    监听套接字
+ * @param [ in] 套接字描述符
+ * @param [out] NULL
+ * @return      0
+ */
+int NET::linsten_init(int fd){
+	if(listen(fd, 5) != 0){
+		printf("listen failed\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+/*
+ * function:    等待客户端连接
+ * @param [ in] 套接字描述符
+ * @param [out] NULL
+ * @return      新套接字描述符
+ */
+
+int NET::accept_init(int fd){
+	int clifd;
+	struct sockaddr_in cliaddr;
+	socklen_t len;
+	len = sizeof(cliaddr);
+	
+	if((clifd = accept(fd,(struct sockaddr*)&cliaddr,&len)) < 0){
+		printf("accept failed\n");
+		return -1;
+	}
+
+	return clifd;
+}
+
+
+/*
+ * function:    连接服务器
+ * @param [ in] NULL
+ * @param [out] NULL
+ * @return      0
+ */
+
+int NET::connect_init(int fd){
+	struct sockaddr_in servaddr;
+	if(connect(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) != 0){
+		printf("connect failed\n");
+		return -1;
+	}
+	
+	return 0;
+}
+
+#if 0
+/*
+ * function:    epoll 初始化
+ * @param [ in] NULL
+ * @param [out] NULL
+ * @return      0
+ */
+
+int NET::epoll_init(void){
+	int epoll_fd;
+
+	if((epoll_fd = epoll_create(1)) == -1){
+		printf("epoll_create failed\n");
+		return -1;
+	}
+
+	return epoll_fd;
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+int NET::epoll_add(int fd, struct epoll_event *ev){
+	//printf("add %d\n",fd);
+	ev->data->fd = fd;
+	ev->events = EPOLLIN | EPOLLET;
+	if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1){
+		printf("epoll_ctl_add fd failed\n");
+		return -1;
+	}
+
+	printf("%d\n",ev.data.fd);
+	return 0;
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+
+int NET::epoll_del(void){
+/*	if(epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, &ev) == -1){
+		printf("epoll_ctl_del fd failed\n");
+		return -1;
+	}
+*/
+	return 0;
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+
+int NET::epoll_waits(void){
+	if((nfds = epoll_wait(epoll_fd, evs, EPOLL_SIZE, -1)) == -1){
+		printf("epoll_wait failed\n");
+		return -1;
+	}
+
+	return nfds;
+}
+#endif
