@@ -8,7 +8,7 @@
  */
 
 int NET::socket_init(void){
-	if((serfd = socket(AF_INET,SOCK_STREAM,NULL)) == -1){
+	if((serfd = socket(AF_INET,SOCK_STREAM,0)) == -1){
 		printf("socket failed\n");
 		return -1;
 	}
@@ -23,11 +23,11 @@ int NET::socket_init(void){
  * @return      0
  */
 
-int NET::bind_init(char **a,char **p){
-	memset(&servaddr,0,sizeof(servaddr));
+int NET::bind_init(void){
+	bzero(&servaddr,0);
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(atoi(*p));
-	servaddr.sin_addr.s_addr = inet_addr(atoi(*a));
+	servaddr.sin_port = htons(PORT);
+	servaddr.sin_addr.s_addr = inet_addr(IP);
 
 	if(bind(serfd,(struct sockaddr*)&servaddr,sizeof(servaddr)) != 0){
 		perror("bind failed\n");
@@ -63,7 +63,7 @@ int NET::linsten_init(void){
 int NET::accept_init(void){
 	len = sizeof(cliaddr);
 	
-	if((clifd = accept(fd,(struct sockeaddr*)&cliaddr,&len)) < 0){
+	if((clifd = accept(serfd,(struct sockaddr*)&cliaddr,&len)) < 0){
 		printf("accept failed\n");
 		return -1;
 	}
@@ -110,7 +110,10 @@ int NET::epoll_init(void){
  * @param [out] 
  * @return      
  */
-int NET::epoll_add(int fd){
+int NET::epoll_add(void){
+	
+	fd = serfd > clifd ? serfd : clifd;
+
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = fd;
 	if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1){
@@ -118,6 +121,7 @@ int NET::epoll_add(int fd){
 		return -1;
 	}
 
+	printf("%d\n",ev.data.fd);
 	return 0;
 }
 
@@ -144,7 +148,7 @@ int NET::epoll_del(void){
  * @return      
  */
 
-int NET::epoll_wait(void){
+int NET::epoll_waits(void){
 	if((nfds = epoll_wait(epoll_fd, evs, EPOLL_SIZE, -1)) == -1){
 		printf("epoll_wait failed\n");
 		return -1;
@@ -152,3 +156,4 @@ int NET::epoll_wait(void){
 
 	return 0;
 }
+
