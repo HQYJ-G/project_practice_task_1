@@ -6,7 +6,12 @@ int main(int argc, const char *argv[])
 	a.socket_init();
 	a.bind_init();
 	a.listen_init();
-	a.accept_init();
 
+	a.epoll_init();
+	a.sepoll_add();
+	while(1){
+		a.epoll_waits();
+		//a.accept_init();
+	}
 	return 0;
 }

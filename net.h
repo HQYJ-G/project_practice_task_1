@@ -8,92 +8,49 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/epoll.h>
 
 #define PORT 8888
 #define IP "192.168.0.103"
 
+#define EPOLL_SIZE 100
+struct data{
+	int id;
+	char name[32];
+	char passwd[128];
+};
+
 class NET{
-public:
-#if 0
-	int socket_init(){
-		if((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
-			return -1;
-		}else{
-			printf("fd;%d\n",fd);
-		}
-		return 0;
-	};
-	int bind_init(){
-		bzero(&servaddr,0);
-		servaddr.sin_family = AF_INET;
-		servaddr.sin_port = htons(PORT);
-		servaddr.sin_addr.s_addr = inet_addr(IP);
-		if(bind(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) < 0)
-			return -1;
-		else
-			printf("bind ok\n");
-		return 0;
-	};
-	int listen_init(){
-		if(listen(fd,5) != 0)
-			return -1;
-		else
-			printf("listen....\n");
-		return 0;
-	};
+	public:
+		/*socket api function*/
+		int socket_init(void);
+		int bind_init(void);
+		int listen_init(void);
+		int accept_init(void);
+		int connect_init(void);
+#if 1
+		/*epoll api function*/
+		int epoll_init(void);
+		int sepoll_add(void);
+		int cepoll_add(void);
+		int epoll_del(void);
+		int epoll_waits(void);
+#endif 
+	private:
+		/* socket data*/
+		int fd,cfd,dfd;
+		struct sockaddr_in servaddr,cliaddr;
+		socklen_t len;
+		char buf[128];
 
-	int accept_init(){
-		len = sizeof(cliaddr);
-			if((cfd = accept(fd,(struct sockaddr*)&cliaddr,&len)) == -1){
-				return -1;
-			}else{
-				printf("cfd : %d\n",cfd);
-			}
-		while(1){
-			bzero(buf,0);
-			recv(cfd,buf,sizeof(buf),0);
-			printf("buf:%s\n",buf);
+		struct data dt;
 
-			if(strncmp(buf,"quit",4) == 0)
-				break;
-		}
-
-		close(cfd);
-		close(fd);
-		return 0;
-	};
-
-	int connect_init(){
-		if(connect(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) != 0)
-			return -1;
-		else
-			printf("connect ok\n");
-
-		while(1){
-			bzero(buf,0);
-			fgets(buf,128,stdin);
-			send(fd,buf,128,0);
-
-			if(strncmp(buf,"quit",4) == 0)
-				break;
-		}
-
-		close(fd);
-
-		return 0;
-	};
-#else 
-	int socket_init(void);
-	int bind_init(void);
-	int listen_init(void);
-	int accept_init(void);
-	int connect_init(void);
-
-#endif	
-private:
-	int fd,cfd;
-	struct sockaddr_in servaddr,cliaddr;
-	socklen_t len;
-	char buf[128];
+#if 1
+		/* epoll data*/
+		int efd;
+		int nfds;
+		struct epoll_event evt;
+		struct epoll_event evts[EPOLL_SIZE];
+#endif
 };
 #endif
