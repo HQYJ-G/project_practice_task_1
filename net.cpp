@@ -38,6 +38,22 @@ int NET::bind_init(){
 	return 0;
 };
 
+/*
+ * function:   	绑定套接字
+ * @param [ in] NULL
+ * @param [out] NULL
+ * @return      0
+ */
+
+int NET::cbind_init(){
+	bzero(&servaddr,0);
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(PORT);
+	servaddr.sin_addr.s_addr = inet_addr(IP);
+
+	return 0;
+};
+
 
 /*
  * function:    监听套接字
@@ -69,22 +85,7 @@ int NET::accept_init(){
 		perror("accpet failed\n");
 		return -1;
 	}
-#if 0
- 	else{
-		printf("cfd : %d\n",cfd);
-	}
-	while(1){
-		bzero(buf,0);
-		recv(cfd,buf,sizeof(buf),0);
-		printf("buf:%s\n",buf);
 
-		if(strncmp(buf,"quit",4) == 0)
-			break;
-	}
-
-	close(cfd);
-	close(fd);
-#endif
 	return 0;
 };
 
@@ -97,9 +98,10 @@ int NET::accept_init(){
  */
 
 int NET::connect_init(){
-	if(connect(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) != 0)
+	if(connect(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) != 0){
+		perror("connect failed\n");
 		return -1;
-	else
+	}else
 		printf("connect ok\n");
 
 	while(1){
@@ -149,8 +151,6 @@ int NET::sepoll_add(void){
 		return -1;
 	}
 
-	printf("evts:%d\n",evt.data.fd);
-	printf("jin ru wait\n");
 	return 0;
 }
 
@@ -189,26 +189,21 @@ int NET::epoll_waits(void){
 		return -1;
 	}
 	printf("%d\n",nfds);
-	//printf("ceshi jia ru de fd shifouzhengqut %d\n",evts[nfds].data.fd);
-	printf("ceshi jia ru de fd shifouzhengqut %d\n",evts[0].data.fd);
 
 	for(i = 0; i < nfds; i++){
 		if(evts[i].data.fd == fd){
 			NET::accept_init();
-	//		printf("cfd ok\n");
 			NET::cepoll_add();
-	//		printf("wait fd ok\n");
 			continue;
 		}else{
 			int relen;
 			relen = recv(evts[i].data.fd , buf, 128, 0);
-			if(relen < 0){
+			if(relen <= 0){
 				printf("cfd :%d exit\n",evts[i].data.fd);
 				close(evts[i].data.fd);
 				epoll_ctl(efd,EPOLL_CTL_DEL, evts[i].data.fd, &evt);
 				continue;
 			}else{
-				char buf[128];
 				printf("cfd %d:%s\n",evts[i].data.fd, buf);
 			}
 		}
