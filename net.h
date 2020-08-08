@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/epoll.h>
+#include "staff.h"
 
 #define PORT 8888
 #define IP "192.168.0.103"
@@ -35,6 +36,13 @@ class NET{
 		int sepoll_add(void);
 		int cepoll_add(void);
 		int epoll_waits(void);
+
+		/*staff api function*/
+		int add_staff(void);
+		int del_staff(void);
+		int change_staff(void);
+
+
 #endif 
 	private:
 		/* socket data*/
@@ -43,7 +51,7 @@ class NET{
 		socklen_t len;
 		char buf[128];
 
-		struct data dt;
+		struct staff sd;
 
 #if 1
 		/* epoll data*/
