@@ -25,6 +25,7 @@ class NET{
 		/*socket api function*/
 		int socket_init(void);
 		int bind_init(void);
+		int cbind_init(void);
 		int listen_init(void);
 		int accept_init(void);
 		int connect_init(void);
@@ -33,7 +34,6 @@ class NET{
 		int epoll_init(void);
 		int sepoll_add(void);
 		int cepoll_add(void);
-		int epoll_del(void);
 		int epoll_waits(void);
 #endif 
 	private:
