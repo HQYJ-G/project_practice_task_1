@@ -214,9 +214,9 @@ int NET::epoll_waits(void){
 			int relen;
 			relen = recv(evts[i].data.fd , &sd, sizeof(sd), 0);
 			if(relen <= 0){
-				printf("cfd :%d exit\n",evts[i].data.fd);
 				close(evts[i].data.fd);
 				epoll_ctl(efd,EPOLL_CTL_DEL, evts[i].data.fd, &evt);
+				printf("cfd :%d exit\n",evts[i].data.fd);
 				continue;
 			}else{
 				printf("%s-%s-%d-%s-%s-%d\n",sd.name, sd.sex, sd.age,\
