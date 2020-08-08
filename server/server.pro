@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2020-08-07T16:20:29
+# Project created by QtCreator 2020-08-08T17:10:13
 #
 #-------------------------------------------------
 
@@ -8,14 +8,15 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = client
+TARGET = server
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        widget.cpp
+        widget.cpp \
+    ../sql/sqlite.cpp
 
 HEADERS  += widget.h \
-    ../protocol.h
+    ../sql/sqlite.h
 
 FORMS    += widget.ui
