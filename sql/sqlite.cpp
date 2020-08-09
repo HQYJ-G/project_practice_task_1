@@ -48,7 +48,7 @@ Sqlite::~Sqlite()
 /*
   *名称：      CreateTable
   *功能：      创建一个表
-  * 参数：     const string TableName 表名；const string ColumnName列名+类型
+  * 参数：     const string TableName 表名；const string ColumnName列名+类型(e.g. " ID INTEGER PRIMARY KEY   AUTOINCREMENT,NAME TEXT NOT NULL,AGE INT")
   * 返回值： 成功返回0；失败返回-1
 */
 int Sqlite::CreateTable(const string TableName,const string ColumnName)
@@ -228,3 +228,4 @@ int Sqlite::Delect(const string TableName, const string Pos)
     }
     return 0;
 };
+

@@ -10,7 +10,13 @@ Widget::Widget(QWidget *parent) :
 
     ui->setupUi(this);
     Sqlite sql("employeeinfo.db");
-    sql.CreateTable("info"," ID INTEGER PRIMARY KEY   AUTOINCREMENT,NAME TEXT NOT NULL,AGE INT ,GENDER TEXT,TEL TEXT, WAGE INT, AUTH TEXT, PWD TEXT");
+    sql.CreateTable("Info"," ID INTEGER PRIMARY KEY   AUTOINCREMENT,Name TEXT NOT NULL,Age INT ,Gender TEXT,TEL TEXT, Wage INT, Auth TEXT, Pwd TEXT");
+    sql.CreateTable("Attend","ID INTEGER PRIMARY KEY, Name Text, Time Text");
+    sql.CreateTable("Log","ID INTEGER PRIMARY KEY, Name Text,Time Text,Spoor Text");
+
+    sql.Insert("Attend","ID,Name,Time","1,\"X\",\"2002-01-02\"");
+    sql.Insert("Log","ID,Name,Time","1,\"X\",\"2002-01-02\"");
+
     sql.Insert("info","NAME,AGE,GENDER","\"X\",18,\"man\"");
     sql.Insert("info","NAME,AGE,GENDER","\"s\",18,\"man\"");
     sql.Select("info","ID = 1");

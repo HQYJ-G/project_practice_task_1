@@ -48,4 +48,5 @@ class Sqlite
         int Delect(const string TableName, const string Pos);
 };
 
+int CreateInfo(void);
 #endif
