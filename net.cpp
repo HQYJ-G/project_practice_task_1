@@ -219,6 +219,7 @@ int NET::epoll_waits(void){
 				printf("cfd :%d exit\n",evts[i].data.fd);
 				continue;
 			}else{
+				NET::anal_staff();
 				printf("%s-%s-%d-%s-%s-%d\n",sd.name, sd.sex, sd.age,\
 						sd.phone, sd.addr, sd.menoy);
 
@@ -235,7 +236,7 @@ int NET::epoll_waits(void){
 /*******staff api***********/
 
 /*
- * function:    
+ * function:    添加员工信息
  * @param [ in] 
  * @param [out] 
  * @return      
@@ -246,6 +247,10 @@ int NET::add_staff(void){
 
 	printf("please name:");
 	scanf("%s",sd.name);
+	getchar();
+
+	printf("please passwd:");
+	scanf("%s",sd.passwd);
 	getchar();
 
 	printf("please sex:");
@@ -268,7 +273,7 @@ int NET::add_staff(void){
 	scanf("%d",&sd.menoy);
 	getchar();
 
-	printf("%s-%s-%d-%s-%s-%d\n",sd.name, sd.sex, sd.age,\
+	printf("%s-%s-%s-%d-%s-%s-%d\n",sd.name, sd.passwd, sd.sex, sd.age,\
 			sd.phone, sd.addr, sd.menoy);
 
 
@@ -293,7 +298,7 @@ int ST::del_staff(void){
 }
 #endif
 /*
- * function:    
+ * function:    修改员工信息
  * @param [ in] 
  * @param [out] 
  * @return      
@@ -340,4 +345,108 @@ int NET::change_staff(void){
 
 	return 0;
 } 
+
+/*
+ * function:    解析员工操作
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+int NET::anal_staff(void){
+	switch(sd.type){
+	case R:
+		NET::R_staff();
+		break;
+	case L:
+		NET::L_staff();
+		break;
+	case Q:
+		NET::Q_staff();
+		break;
+	case H:
+		NET::H_staff();
+		break;
+	case C:
+		NET::C_staff();
+		break;
+	}
+
+	return 0;
+
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+/*注意事项：应该与合作者沟通在那个函数封装命令*/
+int NET::R_staff(void){
+	printf("%s\n",__FUNCTION__);
+	sprintf(sql,"insert into st(name, passwd,sex,age,phone,addr,menoy) \
+			values('%s','%s', %s', '%d, '%s', '%s', %d );",sd.name, sd.passwd,\
+			sd.sex, sd.age, sd.phone, sd.addr, sd.menoy);
+
+	/*此处调用数据库接口，或者在自己写一个方法*/
+
+	return 0;
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+int NET::L_staff(void){
+	printf("%s\n",__FUNCTION__);
+
+
+
+	return 0;
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+int NET::Q_staff(void){
+	printf("%s\n",__FUNCTION__);
+
+
+	return 0;
+
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+int NET::H_staff(void){
+	printf("%s\n",__FUNCTION__);
+
+
+	return 0;
+
+}
+
+/*
+ * function:    
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+int NET::C_staff(void){
+	printf("%s\n",__FUNCTION__);
+
+
+	return 0;
+
+}
+
 #endif

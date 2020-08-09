@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * net.h 
+ *
+ * @fcopyright  Copyright 2020 hua qing yuan jian .
+ * @fauthor     [Zhou ZhenQuan] [zhouzhenquan0310@qq.com]
+ * @fversion    1.0
+ *
+ * @fhistory    [2020-08-08] Create file.
+ ******************************************************************************/
+
 #ifndef __NET_H__
 #define __NET_H__
 
@@ -12,14 +22,9 @@
 #include "staff.h"
 
 #define PORT 8888
-#define IP "192.168.0.103"
+#define IP "192.168.0.200"
 
 #define EPOLL_SIZE 100
-struct data{
-	int id;
-	char name[32];
-	char passwd[128];
-};
 
 class NET{
 	public:
@@ -30,7 +35,7 @@ class NET{
 		int listen_init(void);
 		int accept_init(void);
 		int connect_init(void);
-#if 1
+
 		/*epoll api function*/
 		int epoll_init(void);
 		int sepoll_add(void);
@@ -42,8 +47,14 @@ class NET{
 		int del_staff(void);
 		int change_staff(void);
 
+		/*解析信息api*/
+		int anal_staff(void);
+		int R_staff(void);
+		int L_staff(void);
+		int Q_staff(void);
+		int H_staff(void);
+		int C_staff(void);
 
-#endif 
 	private:
 		/* socket data*/
 		int fd,cfd,dfd;
@@ -51,14 +62,17 @@ class NET{
 		socklen_t len;
 		char buf[128];
 
-		struct staff sd;
 
-#if 1
 		/* epoll data*/
 		int efd;
 		int nfds;
 		struct epoll_event evt;
 		struct epoll_event evts[EPOLL_SIZE];
-#endif
+
+		/*staff dtat*/
+		struct staff sd;
+
+		/*用于封装sqlite命令*/
+		char sql[128];
 };
 #endif
