@@ -15,21 +15,34 @@
 #include<iostream>
 #include<queue>
 
-const unsigned int CMD_MAX  =  32;
-const unsigned int PARA_MAX  =  128;
-const unsigned int MSG_MAX  =  512;
+using namespace std;
 
-struct ClientToServer 
-{
-    char cmd[CMD_MAX];//客户端发送的命令
-    char para[PARA_MAX ];//命令的参数
-};
+const unsigned int NAME_MAX  =  32;
+const unsigned int BUF_MAX = 256;
 
-struct ServerToClient
+typedef enum
 {
-    char msg[MSG_MAX] ;//服务端返回的消息
-	unsigned int pic;//未发送消息数量
-};
+    LOGIN = 0,//登录
+    REGISTER,//注册
+    INQUIRE,//查询
+
+}eCmdType;
+
+typedef enum
+{
+    USER = 0,//用户
+    ROOT,//管理员
+
+}eAuthorityType;
+
+typedef struct
+{
+    eCmdType type;//客户端发送的命令
+    char name[NAME_MAX];//用户名
+    char pwd[NAME_MAX];//密码
+    eAuthorityType authority;//用户权限
+    char buf[256];//消息缓存
+}sPrtcls;
 
 
 class MsgHandler

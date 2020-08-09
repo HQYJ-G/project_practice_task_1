@@ -5,6 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += sql
+LIBS       += -lsqlite3
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,6 +19,7 @@ SOURCES += main.cpp\
     ../sql/sqlite.cpp
 
 HEADERS  += widget.h \
-    ../sql/sqlite.h
+    ../sql/sqlite.h \
+    ../protocol.h
 
 FORMS    += widget.ui

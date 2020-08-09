@@ -14,22 +14,38 @@
 
 #include<sqlite3.h>
 #include<iostream>
+#include<queue>
+#include<stdio.h>
 
 using namespace std;
+
+typedef struct
+{
+    string key;
+    string val;
+}sBufType;
+
+
 
 class Sqlite
 {
 	private:
 		sqlite3 *db;
+        int Result;
+        char * ErrMsg;
+        static int callbask(void *data, int argc, char **argv, char **azColName);
 
 	public:
+
+        queue<sBufType> Buf;
+
 		Sqlite(const string s);
 		~Sqlite();
-		CreateTable(const string s);
-		Select(const string s);
-		Insert(const string s);
-		Updata(const string s);
-		Delect(const string s);
-}
+        int CreateTable(const string TableName,const string ColumnName);
+        int Select(const string TableName, const string Pos);
+        int Insert(const string TableName, const string ColumnName,const string Value);
+        int Updata(const string TableName, const string Pos,const string KeyVal);
+        int Delect(const string TableName, const string Pos);
+};
 
 #endif
