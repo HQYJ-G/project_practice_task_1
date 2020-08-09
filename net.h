@@ -21,18 +21,57 @@
 #include <sys/epoll.h>
 #include "staff.h"
 
-#define PORT 8888
-#define IP "192.168.0.200"
-
 #define EPOLL_SIZE 100
 
 class NET{
 	public:
+		NET(char a[], char b[],int n){
+			if((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+				perror("socket failed\n");
+			}else{
+				printf("fd;%d\n",fd);
+			}
+			int i = 1;
+			setsockopt(fd,SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int));
+
+			bzero(&servaddr,0);
+			servaddr.sin_family = AF_INET;
+			servaddr.sin_port = htons(atoi(b));
+			servaddr.sin_addr.s_addr = inet_addr(a);
+			if(bind(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) < 0){
+				perror("bind failed\n");
+			}else
+				printf("bind ok\n");
+
+			if(listen(fd,n) != 0){
+				perror("listen failed\n");
+			}else
+				printf("listen....\n");
+
+		}
+		NET(char a[], char b[]){
+			printf("%s %d\n",a,atoi(b));
+			if((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+				perror("socket failed\n");
+			}else{
+				printf("fd;%d\n",fd);
+			}
+
+			bzero(&servaddr,0);
+			servaddr.sin_family = AF_INET;
+			servaddr.sin_port = htons(atoi(b));
+			servaddr.sin_addr.s_addr = inet_addr(a);
+			printf("bind ok\n");
+
+		}
+
+		~NET(){
+			close(fd);
+			printf("~~~~~~~~~~~\n");
+		}
+
+
 		/*socket api function*/
-		int socket_init(void);
-		int bind_init(void);
-		int cbind_init(void);
-		int listen_init(void);
 		int accept_init(void);
 		int connect_init(void);
 
