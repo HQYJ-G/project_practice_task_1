@@ -288,20 +288,23 @@ int NET::R_staff(void){
  */
 int NET::L_staff(void){
 	sd.type = LOGIN;
-
-	cout << "*****************" << endl;
-	cout << "1:普通用户 2:root" << endl;
-	cout << "*****************" << endl;
-
 	int n;
-	cout << "输入选项:";
-	cin >> n;
 
-	if(n < 1 || n > 2){
-		cout << "输入错误！" << endl;
-		exit(-1);
+	while(1){
+		cout << "*****************" << endl;
+		cout << "1:普通用户 2:root" << endl;
+		cout << "*****************" << endl;
+
+		cout << "输入选项:";
+		cin >> n;
+
+		if(n < 1 || n > 2){
+			cout << "输入错误！" << endl;
+			continue;
+		}else{
+			break;
+		}
 	}
-
 	if(n == 1){
 		sd.authority = USER;
 	}else{
