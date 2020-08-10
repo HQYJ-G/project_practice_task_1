@@ -310,6 +310,7 @@ int NET::L_staff(void){
 			}
 		}
 		else{
+			i = 0;
 			break;
 		}
 	}
