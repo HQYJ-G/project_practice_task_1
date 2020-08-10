@@ -172,6 +172,7 @@ int cHandler::SelectName(string Table,string Name)
 {
     return sql->Select(Table,"Name=\""+Name+"\"");
 }
+
 /*
   *名称：      ClientHandler
   *功能：      处理客户端消息；
@@ -185,11 +186,20 @@ int cHandler::ClientHandler()
     switch (Msg->type)
     {
         case LOGIN:
-            SelectInfoName(Msg->name);
+            if (SelectInfoName(Msg->name) == -1)
+            {
+               strcpy(Msg->buf,"Failed");
+               return -1;
+            }
 
             do
             {
                 sql->QueueOut(Temp);
+                if (Temp.num == 0)
+                {
+                     strcpy(Msg->buf,"Failed");
+                     return -1;
+                }
                 if (Temp.key == "Auth")
                 {
 
@@ -208,12 +218,12 @@ int cHandler::ClientHandler()
 
             if (Temp.val == Msg->pwd)
             {
-                strcpy(Msg->buf,"OK");
-                return 0;
+                strcpy(Msg->buf,"OK");   
+            }else
+            {
+                strcpy(Msg->buf,"Failed");
             }
-
-            strcpy(Msg->buf,"Failed");
-            return -1;
+            return 0;
 
         case REGISTER:
             if (AddNewUser(Msg->name,"0","0","0","0","0",Msg->pwd))
