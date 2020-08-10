@@ -355,26 +355,57 @@ int NET::Q_staff(void){
 	//	printf("%s\n",__FUNCTION__);
 	sd.type = INQUIRE;
 
-	if(sd.authority == ROOT){
-		cout << "要查询的名字:";
-		cin >> sd.name;
+	int n = 0,i = 0;
+
+	while(1){
+		if(sd.authority == ROOT){
+			cout << "要查询的名字:";
+			cin >> sd.name;
+		}
+
+		sprintf(sd.buf,"%s,",sd.name);
+		if(send(fd,&sd,sizeof(sd), 0) == -1){
+			cout << "send err!" << endl;
+			exit(-1);
+		}else{
+			cout << "send ok!" << endl;
+		}
+
+		if(recv(fd,&sd,sizeof(sd), 0) == -1){
+			cout << "recv err!" << endl;
+			exit(-1);
+		}
+
+		cout << sd.buf << endl;
+
+		cout << "************************" << endl;
+		cout << "1:继续查询 2:返回上一层" << endl;
+		cout << "************************" << endl;
+		cout << "请输入:";
+		cin >> n;
+		while(1){
+			if(n < 1 || n > 2)
+			{
+				cout << "输入错误！" << endl;
+
+				if(i >= 3){
+					NET::main_interface();
+				}else{
+					i++;
+					continue;
+				}
+			}
+			else{	
+				i = 0;
+				break;
+			}
+		}
+		if(n == 1){
+			continue;
+		}else{
+			NET::SubMenu();
+		}
 	}
-
-	sprintf(sd.buf,"%s,",sd.name);
-	if(send(fd,&sd,sizeof(sd), 0) == -1){
-		cout << "send err!" << endl;
-		exit(-1);
-	}else{
-		cout << "send ok!" << endl;
-	}
-
-	if(recv(fd,&sd,sizeof(sd), 0) == -1){
-		cout << "recv err!" << endl;
-		exit(-1);
-	}
-
-	cout << sd.buf << endl;
-
 	return 0;
 
 }
