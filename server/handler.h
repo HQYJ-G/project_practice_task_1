@@ -14,22 +14,26 @@
 
 #include"../protocol.h"
 #include"../sql/sqlite.h"
+#include"../tcp/tcp.h"
 
 class cHandler
 {
     private:
         cSqlite *sql;
         sPrtcls *Msg;
+        cMyTcp *Tcp;
  //       const string quoting = "\"";
     public:
 
-        cHandler(cSqlite *sql1,sPrtcls *Msg1);
+        cHandler(cSqlite *sql1,sPrtcls *Msg1,cMyTcp *Tcp1);
         ~cHandler();
 
         int CreateTabe(void);
         int AddNewUser(string Name,string Age,string Gender,string Tel,string Wage,string Auth,string Pwd);
         int AddAttend(string ID,string Name,string Data);
         int AddLog(string ID,string Name,string Data,string Spoor);
+        int SelectID(string Table,string ID);
+        int SelectName(string Table,string Name);
         int SelectInfoID(string ID);
         int SelectInfoName(string Name);
         int SelectAttendID(string ID);
@@ -37,6 +41,8 @@ class cHandler
         int SelectLogID(string ID);
         int SelectLogName(string Name);
         int ClientHandler();
+        void CharHandler(string Msg,string &a,string &b);
+        void Inquire();
 
 };
 

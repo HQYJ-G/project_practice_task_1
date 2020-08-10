@@ -94,6 +94,8 @@ int cSqlite::Select(const string TableName, const string Pos)
 
     sqlcmd = "SELECT  * FROM " + TableName + " WHERE " + Pos +  " ; ";
 
+    cout << sqlcmd <<endl;
+
     Result = sqlite3_exec(db,sqlcmd.c_str(),cSqlite::callbask,this,&ErrMsg);
 
     if(Result == 0)
@@ -126,6 +128,7 @@ int cSqlite::callbask(void *data, int argc, char **argv, char **azColName)
     {
         temp.key = azColName[i];
         temp.val=  argv[i]?argv[i]:"NULL";
+        temp.num = argc;
         t->Buf.push(temp);
     }
 

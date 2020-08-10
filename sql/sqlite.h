@@ -23,6 +23,7 @@ typedef struct
 {
     string key;
     string val;
+    int num;
 }sBufType;
 
 

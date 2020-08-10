@@ -13,16 +13,19 @@
 #include"../protocol.h"
 #include"../sql/sqlite.h"
 #include<string.h>
+#include "../tcp/tcp.h"
+
 /*
   *名称：      构造函数
   *功能：      初始化变量
   * 参数：     Sqlite *sql1 数据库对象指针：sPrtcls *Msg1消息对象指针
   * 返回值： 无
 */
-cHandler::cHandler(cSqlite *sql1,sPrtcls *Msg1)
+cHandler::cHandler(cSqlite *sql1,sPrtcls *Msg1,cMyTcp *Tcp1)
 {
     sql= sql1;
     Msg = Msg1;
+    Tcp = Tcp1;
 }
 
 /*
@@ -148,7 +151,33 @@ int cHandler::SelectLogName(string Name)
     return sql->Select("Log","Name=\""+Name+"\"");
 }
 
+/*
+  *名称：      SelectID
+  *功能：      根据ID进行查找
+  * 参数：     string Table表名;string Name名字；
+  * 返回值： 无
+*/
+int cHandler::SelectID(string Table,string ID)
+{
+    return sql->Select(Table,"ID="+ID);
+}
 
+/*
+  *名称：      SelectName
+  *功能：      根据Name进行查找
+  * 参数：     string Table表名;string Name名字；
+  * 返回值： 无
+*/
+int cHandler::SelectName(string Table,string Name)
+{
+    return sql->Select(Table,"Name=\""+Name+"\"");
+}
+/*
+  *名称：      ClientHandler
+  *功能：      处理客户端消息；
+  * 参数：
+  * 返回值： 无
+*/
 int cHandler::ClientHandler()
 {
     sBufType Temp;
@@ -163,9 +192,19 @@ int cHandler::ClientHandler()
                 sql->QueueOut(Temp);
                 if (Temp.key == "Auth")
                 {
-                    Msg->authority = Temp.val=="root"?ROOT:USER;
+
+                    if (strncmp("USER",Temp.val.c_str(),4))
+                    {
+                        if (Msg->authority == ROOT)
+                        {
+                            strcpy(Msg->buf,"Failed");
+                           return -1;
+                        }
+                    }
                 }
             }while(Temp.key != "Pwd");
+
+            sql->CleanBuf();
 
             if (Temp.val == Msg->pwd)
             {
@@ -177,9 +216,20 @@ int cHandler::ClientHandler()
             return -1;
 
         case REGISTER:
-
-            break;
+            if (AddNewUser(Msg->name,"0","0","0","0","0",Msg->pwd))
+            {
+                memset(Msg,0,sizeof(sPrtcls));
+                strcpy(Msg->buf,"Failed");
+                return -1;
+            }
+            memset(Msg,0,sizeof(sPrtcls));
+            strcpy(Msg->buf,"OK");
+            return 0;
         case INQUIRE:
+ //       strcpy(Msg->buf,"aaaaaa");
+           Inquire();
+            return 0;
+        case UPDATE:
 
             break;
         default:
@@ -190,3 +240,43 @@ int cHandler::ClientHandler()
     return 0;
 };
 
+void cHandler::Inquire()
+{
+    string temp;
+    string temp2;
+    string temp3;
+    sBufType temp4;
+    int i;
+
+    if(Msg->authority == ROOT)
+    {
+        CharHandler(Msg->buf,temp,temp2);
+       SelectName(temp,temp2);
+        cout<<"ROOT"<<endl;
+     }else
+    {
+        SelectName(Msg->buf,Msg->name);
+        cout<<"USER"<<endl;
+     }
+
+    temp3.clear();
+    while(!sql->Buf.empty())
+    {
+
+        sql->QueueOut(temp4);
+        temp3 += temp4.val+"|";
+    }
+    cout<<temp3<<endl;
+    strncpy(Msg->buf,temp3.c_str(),temp3.size());
+
+    return;
+}
+
+void cHandler::CharHandler(string Msg,string &a,string &b)
+{
+    int Pos1;
+
+    Pos1 = Msg.find(",");
+    a = Msg.substr(0,Pos1);
+    b = Msg.substr(Pos1+1,Msg.size()-Pos1);
+}

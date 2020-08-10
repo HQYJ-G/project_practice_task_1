@@ -1,3 +1,14 @@
+/*
+ * Name : tcp.cpp
+ * Date : 2020年8月7日
+ * Description : tcp功能实现
+ * Author : 熊涛
+ * Version : V1.0
+ * Modification:
+ *
+*/
+
+
 #include"../protocol.h"
 #include"tcp.h"
 
@@ -13,7 +24,7 @@
 
  cMyTcp::~cMyTcp()
  {
-     delete MyServer ;
+
  };
 
  void cMyTcp::TcpServer(void)
@@ -40,18 +51,25 @@
 
  void cMyTcp::WaitClient()
  {
+     cout<<"wait client connect"<<endl;
      cfd = accept(fd,NULL,NULL);
-     cout<<"aaaaaa"<<endl;
+
  };
 
  void cMyTcp::SendMsg(sPrtcls *Buf, size_t len)
  {
-    send(cfd,Buf,len,0);
+    if (send(cfd,Buf,len,0) == -1)
+    {
+        cout<<"send failed"<<endl;
+    }
  };
 
- void RecvMsg(sPrtcls *Buf, size_t len)
+ void cMyTcp::RecvMsg(sPrtcls *Buf, size_t len)
  {
-     recv(cfd,Buf,len,0);
+     if (recv(cfd,Buf,len,0) == -1)
+     {
+         cout<<"recv failed"<<endl;
+     }
  }
 
 

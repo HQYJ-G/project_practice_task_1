@@ -17,17 +17,15 @@
 
 using namespace std;
 
-/*
-const int NAME_MAX  =  32;
-const int BUF_MAX = 256;
-*/
+const unsigned int NAME_MAX  =  32;
+const unsigned int BUF_MAX = 256;
 
 typedef enum
 {
     LOGIN = 0,//登录
     REGISTER,//注册
     INQUIRE,//查询
-    UPDATE,//修改权限
+	CHANGE,//修改
 
 }eCmdType;
 
@@ -41,14 +39,14 @@ typedef enum
 typedef struct
 {
     eCmdType type;//客户端发送的命令
-    char name[32];//用户名
-    char pwd[32];//密码
+    char name[NAME_MAX];//用户名
+    char pwd[NAME_MAX];//密码
     eAuthorityType authority;//用户权限
-        char sex[1];//性别
-        unsigned int age;//年龄
-        char phone[12];//手机
-        char addr[56];//地址
-        unsigned int menoy;//工资
+	char sex[1];//性别
+	unsigned int age;//年龄
+	char phone[12];//手机
+	char addr[56];//地址
+	unsigned int menoy;//工资
     char buf[256];//消息缓存
 }sPrtcls;
 

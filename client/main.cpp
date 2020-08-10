@@ -47,7 +47,10 @@ int main(int argc, char *argv[])
     {
         recv(fd,&buf,sizeof(buf),0);
        cout<<(buf.type)<<endl;
+       cout<<(buf.pwd)<<endl;
+       cout<<(buf.name)<<endl;
        cout<<(buf.buf)<<endl;
+       cout<<(buf.authority)<<endl;
     }
     return a.exec();
 }
