@@ -189,9 +189,9 @@ int NET::main_interface(void){
  * @return      0
  */
 int NET::SubMenu(void){
-//	printf("%s\n",__FUNCTION__);
+	//	printf("%s\n",__FUNCTION__);
 	cout << "**********************" << endl;
-	cout << "1:查询  2:修改  3:退出" << endl;
+	cout << "1:查询  2:修改  3:返回" << endl;
 	cout << "**********************" << endl;
 
 	int n;
@@ -206,8 +206,8 @@ int NET::SubMenu(void){
 		NET::C_staff();
 		break;
 	case 3:
-		close(fd);
-		exit(0);
+		NET::main_interface();
+		break;
 	default:
 		cout << "输入错误！清重新输入！！！！！" << endl;
 	}
@@ -237,8 +237,8 @@ int NET::R_staff(void){
 	printf("please passwd:");
 	scanf("%s",sd.pwd);
 	getchar();
-#if 0
-	printf("please sex:");
+#if 1
+	printf("please sex(W/M):");
 	scanf("%s",sd.sex);
 	getchar();
 
@@ -250,25 +250,32 @@ int NET::R_staff(void){
 	scanf("%s",sd.phone);
 	getchar();
 
-	printf("please addr:");
-	scanf("%s",sd.addr);
-	getchar();
 
 	printf("please menoy:");
 	scanf("%d",&sd.menoy);
 	getchar();
 
-	printf("%s-%s-%s-%d-%s-%s-%d\n",sd.name, sd.passwd, sd.sex, sd.age,\
-			sd.phone, sd.addr, sd.menoy);
+	sprintf(sd.buf,"%s,%s,%s,%d,%s,%d\n",sd.name, sd.pwd, sd.sex, sd.age,\
+			sd.phone, sd.menoy);
 
 #endif
-	cout << "name " << sd.name << "  " << "pwd " << sd.pwd << endl;
+	printf("%s,%s,%s,%d,%s,%d\n",sd.name, sd.pwd, sd.sex, sd.age,\
+			sd.phone, sd.menoy);
+
 
 	if(send(fd,&sd,sizeof(sd), 0) == -1){
 		cout << "send err!" << endl;
 	}else{
 		cout << "send ok!" << endl;
 	}
+	if(recv(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "send err!" << endl;
+	}else{
+		cout << "注册成功" << endl;
+		cout << sd.buf<< endl;
+	}
+
+
 
 	return 0;
 }
@@ -281,7 +288,7 @@ int NET::R_staff(void){
  */
 int NET::L_staff(void){
 	sd.type = LOGIN;
-	
+
 	cout << "*****************" << endl;
 	cout << "1:普通用户 2:root" << endl;
 	cout << "*****************" << endl;
@@ -319,6 +326,7 @@ int NET::L_staff(void){
 	}
 
 	if(strncmp(sd.buf,"OK",2) == 0){
+		cout << "登陆成功！" << endl;
 		return 1;
 	}
 
@@ -332,12 +340,15 @@ int NET::L_staff(void){
  * @return      0
  */
 int NET::Q_staff(void){
-//	printf("%s\n",__FUNCTION__);
+	//	printf("%s\n",__FUNCTION__);
 	sd.type = INQUIRE;
 
-	cout << "要查询的名字:";
-	cin >> sd.name;
+	if(sd.authority == ROOT){
+		cout << "要查询的名字:";
+		cin >> sd.name;
+	}
 
+	sprintf(sd.buf,"%s,",sd.name);
 	if(send(fd,&sd,sizeof(sd), 0) == -1){
 		cout << "send err!" << endl;
 		exit(-1);
@@ -364,13 +375,74 @@ int NET::Q_staff(void){
  * @return      0
  */
 int NET::C_staff(void){
-//	printf("%s\n",__FUNCTION__);
+	//	printf("%s\n",__FUNCTION__);
+	int n;
 
+	sd.type = CHANGE;
+
+	if(sd.authority == USER){
+		cout << "普通用户没有权限！" << endl;
+		return 0;
+	}
 	cout << "要修改的信息,以id为准" << endl;
-	cout << "请先查询此员工的id号" << endl;
+	cout << "请先查询此员工的🆔号" << endl;
+	cout << "查询方式:以名字为目标" << endl;
+	cout << "继续请安1 结束请安2" << endl;
+
+	cin >> n;
+
+	if(n == 1){
+		int id;
+		cout << "ID:";
+		cin >> id;
+
+		printf("please name:");
+		scanf("%s",sd.name);
+		getchar();
+
+		printf("please passwd:");
+		scanf("%s",sd.pwd);
+		getchar();
+
+		printf("please sex(M/W):");
+		scanf("%s",sd.sex);
+		getchar();
+
+		printf("please age:");
+		scanf("%d",&sd.age);
+		getchar();
+
+		printf("please phone:");
+		scanf("%s",sd.phone);
+		getchar();
 
 
+		printf("please menoy:");
+		scanf("%d",&sd.menoy);
+		getchar();
 
+		sprintf(sd.buf,"%d,%s,%s,%s,%d,%s,%d\n",id,sd.name, sd.pwd, sd.sex, sd.age,\
+				sd.phone, sd.menoy);
+
+	}
+	else if(n == 2){
+		return 0;
+	}
+	else{
+		cout << "输入错误！" << endl;
+	}
+
+	if(send(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "send err!" << endl;
+	}else{
+		cout << "send ok!" << endl;
+	}
+	if(recv(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "send err!" << endl;
+	}else{
+		cout << "修改成功" << endl;
+		cout << sd.buf<< endl;
+	}
 
 
 	return 0;
