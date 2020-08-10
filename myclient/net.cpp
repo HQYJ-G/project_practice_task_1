@@ -294,7 +294,6 @@ int NET::L_staff(void){
 		cout << "*****************" << endl;
 		cout << "1:普通用户 2:root" << endl;
 		cout << "*****************" << endl;
-
 		cout << "输入选项:";
 		cin >> n;
 
