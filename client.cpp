@@ -10,8 +10,13 @@ int main(int argc, char *argv[])
 	}
 
 	NET a(argv[1],argv[2]);
-	a.connect_init();
+
+   a.connect_init();
 	
+	while(1){
+		a.main_interface();
+	};
 
 	return 0;
 }
+

@@ -19,7 +19,10 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/epoll.h>
-#include "staff.h"
+#include "protocol.h"
+#include <iostream>
+
+using namespace std;
 
 #define EPOLL_SIZE 100
 
@@ -63,6 +66,14 @@ class NET{
 			servaddr.sin_addr.s_addr = inet_addr(a);
 			printf("bind ok\n");
 
+#if 0
+			if(connect(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) != 0){
+				perror("connect failed\n");
+			}else
+				printf("connect ok\n");
+#endif 
+
+
 		}
 
 		~NET(){
@@ -80,20 +91,24 @@ class NET{
 		int sepoll_add(void);
 		int cepoll_add(void);
 		int epoll_waits(void);
-
+#if 0
 		/*staff api function*/
 		int add_staff(void);
 		int del_staff(void);
 		int change_staff(void);
 
-		/*解析信息api*/
+#endif 
+		/*客户端api*/
+		int main_interface(void);
+		int SubMenu(void);
 		int anal_staff(void);
 		int R_staff(void);
 		int L_staff(void);
 		int Q_staff(void);
-		int H_staff(void);
 		int C_staff(void);
-
+#if 0
+		int H_staff(void);
+#endif 
 	private:
 		/* socket data*/
 		int fd,cfd,dfd;
@@ -109,9 +124,9 @@ class NET{
 		struct epoll_event evts[EPOLL_SIZE];
 
 		/*staff dtat*/
-		struct staff sd;
+		sPrtcls sd;
 
 		/*用于封装sqlite命令*/
-		char sql[128];
+		//	char sql[128];
 };
 #endif
