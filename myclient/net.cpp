@@ -288,7 +288,7 @@ int NET::R_staff(void){
  */
 int NET::L_staff(void){
 	sd.type = LOGIN;
-	int n;
+	int n, i = 0;
 
 	while(1){
 		cout << "*****************" << endl;
@@ -296,11 +296,20 @@ int NET::L_staff(void){
 		cout << "*****************" << endl;
 		cout << "输入选项:";
 		cin >> n;
+		cout << endl;
 
-		if(n < 1 || n > 2){
+		if(n < 1 || n > 2)
+		{
 			cout << "输入错误！" << endl;
-			continue;
-		}else{
+
+			if(i >= 3){
+				NET::main_interface();
+			}else{
+				i++;
+				continue;
+			}
+		}
+		else{
 			break;
 		}
 	}
