@@ -1,25 +1,30 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2020-08-08T17:10:13
+# Project created by QtCreator 2020-08-10T07:48:13
 #
 #-------------------------------------------------
 
-QT       += core gui
-QT       += sql
-LIBS       += -lsqlite3
+QT       += core
+QT       += network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       -= gui
+
+LIBS    += -lsqlite3
 
 TARGET = server
+CONFIG   += console
+CONFIG   -= app_bundle
+
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        widget.cpp \
-    ../sql/sqlite.cpp
+SOURCES += main.cpp \
+    ../sql/sqlite.cpp \
+    handler.cpp \
+    ../tcp/tcp.cpp
 
-HEADERS  += widget.h \
+HEADERS += \
     ../sql/sqlite.h \
-    ../protocol.h
-
-FORMS    += widget.ui
+    ../protocol.h \
+    handler.h \
+    ../tcp/tcp.h

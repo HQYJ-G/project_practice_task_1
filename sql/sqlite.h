@@ -27,7 +27,7 @@ typedef struct
 
 
 
-class Sqlite
+class cSqlite
 {
 	private:
 		sqlite3 *db;
@@ -39,13 +39,15 @@ class Sqlite
 
         queue<sBufType> Buf;
 
-		Sqlite(const string s);
-		~Sqlite();
+        cSqlite(const string s);
+        ~cSqlite();
         int CreateTable(const string TableName,const string ColumnName);
         int Select(const string TableName, const string Pos);
         int Insert(const string TableName, const string ColumnName,const string Value);
         int Updata(const string TableName, const string Pos,const string KeyVal);
         int Delect(const string TableName, const string Pos);
+        int CleanBuf(void);
+        int QueueOut(sBufType &Buf);
 };
 
 int CreateInfo(void);

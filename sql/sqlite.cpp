@@ -16,7 +16,7 @@
   * 参数：     const string s 数据库名字
   * 返回值： 无
 */
-Sqlite::Sqlite(const string s)
+cSqlite::cSqlite(const string s)
 {
     Result = sqlite3_open(s.c_str(),&db);
 
@@ -37,7 +37,7 @@ Sqlite::Sqlite(const string s)
   * 参数：     无
   * 返回值： 无
 */
-Sqlite::~Sqlite()
+cSqlite::~cSqlite()
 {
     if (Result == 0)
     {
@@ -51,7 +51,7 @@ Sqlite::~Sqlite()
   * 参数：     const string TableName 表名；const string ColumnName列名+类型(e.g. " ID INTEGER PRIMARY KEY   AUTOINCREMENT,NAME TEXT NOT NULL,AGE INT")
   * 返回值： 成功返回0；失败返回-1
 */
-int Sqlite::CreateTable(const string TableName,const string ColumnName)
+int cSqlite::CreateTable(const string TableName,const string ColumnName)
 {
     string sqlcmd;
 
@@ -82,7 +82,7 @@ int Sqlite::CreateTable(const string TableName,const string ColumnName)
   * 参数：     const string TableName 表名；const string Pos查找的目标 （e.g."ColumnName = Value"）
   * 返回值： 成功返回0；失败返回-1
 */
-int Sqlite::Select(const string TableName, const string Pos)
+int cSqlite::Select(const string TableName, const string Pos)
 {
     string sqlcmd;
 
@@ -94,7 +94,7 @@ int Sqlite::Select(const string TableName, const string Pos)
 
     sqlcmd = "SELECT  * FROM " + TableName + " WHERE " + Pos +  " ; ";
 
-    Result = sqlite3_exec(db,sqlcmd.c_str(),Sqlite::callbask,this,&ErrMsg);
+    Result = sqlite3_exec(db,sqlcmd.c_str(),cSqlite::callbask,this,&ErrMsg);
 
     if(Result == 0)
     {
@@ -115,12 +115,12 @@ int Sqlite::Select(const string TableName, const string Pos)
   * 参数：
   * 返回值：
 */
-int Sqlite::callbask(void *data, int argc, char **argv, char **azColName)
+int cSqlite::callbask(void *data, int argc, char **argv, char **azColName)
 {
     int i;
     sBufType temp;
 
-    Sqlite * t = static_cast<Sqlite * >(data);
+    cSqlite * t = static_cast<cSqlite * >(data);
 
     for(i=0; i < argc; i++)
     {
@@ -139,7 +139,7 @@ int Sqlite::callbask(void *data, int argc, char **argv, char **azColName)
   * 参数：     const string TableName 表名；const string ColumnName列名；onst string Value列对应的值
   * 返回值： 成功返回0；失败返回-1
 */
-int Sqlite::Insert(const string TableName, const string ColumnName,const string Value)
+int cSqlite::Insert(const string TableName, const string ColumnName,const string Value)
 {
     string sqlcmd;
 
@@ -172,7 +172,7 @@ int Sqlite::Insert(const string TableName, const string ColumnName,const string 
   * 参数：     const string TableName 表名；const string Pos查找的目标 （e.g."ColumnName = Value"）；const string KeyVal修改列和值（e.g."key = Value"）
   * 返回值： 成功返回0；失败返回-1
 */
-int Sqlite::Updata(const string TableName, const string Pos,const string KeyVal)
+int cSqlite::Updata(const string TableName, const string Pos,const string KeyVal)
 {
     string sqlcmd;
 
@@ -205,7 +205,7 @@ int Sqlite::Updata(const string TableName, const string Pos,const string KeyVal)
   * 参数：     const string TableName 表名；const string Pos查找的目标 （e.g."ColumnName = Value"）
   * 返回值： 成功返回0；失败返回-1
 */
-int Sqlite::Delect(const string TableName, const string Pos)
+int cSqlite::Delect(const string TableName, const string Pos)
 {
     string sqlcmd;
 
@@ -229,3 +229,35 @@ int Sqlite::Delect(const string TableName, const string Pos)
     return 0;
 };
 
+/*
+  *名称：      CleanBuf
+  *功能：      清空缓存
+  * 参数：     无
+  * 返回值： 成功返回0；
+*/
+int cSqlite::CleanBuf(void)
+{
+    while(!Buf.empty())
+        Buf.pop();
+
+    return 0;
+};
+
+/*
+  *名称：      QueueOut
+  *功能：      出队
+  * 参数：     无
+  * 返回值： 成功返回0；失败返回-1；
+*/
+ int cSqlite::QueueOut(sBufType &Buf)
+{
+    if(this->Buf.empty())
+    {
+        return -1;
+    }
+
+    Buf = this->Buf.front();
+    this->Buf.pop();
+
+    return 0;
+};
