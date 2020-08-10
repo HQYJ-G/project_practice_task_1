@@ -358,12 +358,20 @@ int NET::Q_staff(void){
 	int n = 0,i = 0;
 
 	while(1){
+#if 1
 		if(sd.authority == ROOT){
-			cout << "要查询的名字:";
+			cout << "请输入info attend log:";
+			cin >> sd.pwd;
+			cout << "请输入名字:";
 			cin >> sd.name;
+			sprintf(sd.buf,"%s,%s", sd.pwd, sd.name);
+		}else{
+			cout << "请输入info attend log:";
+			cin >> sd.buf;
 		}
+		
+#endif
 
-		sprintf(sd.buf,"%s,",sd.name);
 		if(send(fd,&sd,sizeof(sd), 0) == -1){
 			cout << "send err!" << endl;
 			exit(-1);
