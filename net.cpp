@@ -10,6 +10,7 @@
 
 #include "net.h"
 
+using namespace std;
 
 /*
  * function:    等待客户端连接
@@ -43,25 +44,10 @@ int NET::connect_init(){
 	}else
 		printf("connect ok\n");
 
-	while(1){
-#if 0
-		bzero(buf,0);
-		fgets(buf,128,stdin);
-		send(fd,buf,128,0);
-
-		if(strncmp(buf,"quit",4) == 0)
-			break;
-#endif 
-		bzero(&sd, sizeof(sd));
-		NET::add_staff();
-		send(fd,&sd,sizeof(sd), 0);
-
-	}
-
-	close(fd);
-
 	return 0;
 };
+
+
 
 /*
  * function:    创建epoll多路复用
@@ -149,9 +135,6 @@ int NET::epoll_waits(void){
 				continue;
 			}else{
 				NET::anal_staff();
-				printf("%s-%s-%d-%s-%s-%d\n",sd.name, sd.sex, sd.age,\
-						sd.phone, sd.addr, sd.menoy);
-
 			}
 		}
 	}
@@ -159,29 +142,102 @@ int NET::epoll_waits(void){
 	return 0;
 }
 
-
-
-
 /*******staff api***********/
 
 /*
- * function:    添加员工信息
+ * function:    客户端主界面
+ * @param [ in] NULL
+ * @param [out] NULL
+ * @return      0
+ */
+
+
+int NET::main_interface(void){
+	int n;
+
+	cout << "**********************" << endl;
+	cout << "1:注册  2:登陆  3:退出" << endl; 
+	cout << "**********************" << endl;
+	cout << "请输入你的选项：";
+	cin >> n;
+
+	switch(n){
+	case 1:
+		NET::R_staff();
+		break;
+	case 2:
+		if(L_staff() == 1){
+			NET::SubMenu();
+		}else{
+			cout << "用户名或者密码错误！" << endl;
+			break;
+		}
+	case 3:
+		close(fd);
+		exit(0);
+	default:
+		cout << "输入错误！清重新输入！！！！！" << endl;
+	}
+
+	return 0;
+}
+
+/*
+ * function:   登陆成功后的菜单 
+ * @param [ in] 无
+ * @param [out] 无
+ * @return      0
+ */
+int NET::SubMenu(void){
+//	printf("%s\n",__FUNCTION__);
+	cout << "**********************" << endl;
+	cout << "1:查询  2:修改  3:退出" << endl;
+	cout << "**********************" << endl;
+
+	int n;
+	cout << "请输入你的选项:";
+	cin >> n;
+
+	switch(n){
+	case 1:
+		NET::Q_staff();
+		break;
+	case 2:
+		NET::C_staff();
+		break;
+	case 3:
+		close(fd);
+		exit(0);
+	default:
+		cout << "输入错误！清重新输入！！！！！" << endl;
+	}
+
+	return 0;
+
+}
+
+
+/*
+ * function:    注册员工信息
  * @param [ in] 
  * @param [out] 
  * @return      
  */
-int NET::add_staff(void){
+int NET::R_staff(void){
 
-	sd.type = R;
+	bzero(&sd, sizeof(sd));
+	sd.type = REGISTER;
+	sd.authority = USER;
+
 
 	printf("please name:");
 	scanf("%s",sd.name);
 	getchar();
 
 	printf("please passwd:");
-	scanf("%s",sd.passwd);
+	scanf("%s",sd.pwd);
 	getchar();
-
+#if 0
 	printf("please sex:");
 	scanf("%s",sd.sex);
 	getchar();
@@ -205,18 +261,145 @@ int NET::add_staff(void){
 	printf("%s-%s-%s-%d-%s-%s-%d\n",sd.name, sd.passwd, sd.sex, sd.age,\
 			sd.phone, sd.addr, sd.menoy);
 
+#endif
+	cout << "name " << sd.name << "  " << "pwd " << sd.pwd << endl;
+
+	if(send(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "send err!" << endl;
+	}else{
+		cout << "send ok!" << endl;
+	}
 
 	return 0;
 }
 
+/*
+ * function:    实现登陆功能
+ * @param [ in] 无
+ * @param [out] 无
+ * @return  	成功返回1   
+ */
+int NET::L_staff(void){
+	sd.type = LOGIN;
+	
+	cout << "*****************" << endl;
+	cout << "1:普通用户 2:root" << endl;
+	cout << "*****************" << endl;
 
+	int n;
+	cout << "输入选项:";
+	cin >> n;
+
+	if(n < 1 || n > 2){
+		cout << "输入错误！" << endl;
+		exit(-1);
+	}
+
+	if(n == 1){
+		sd.authority = USER;
+	}else{
+		sd.authority = ROOT;
+	}
+
+	cout << "名字:";
+	cin >> sd.name ;
+	cout << "密码:";
+	cin >> sd.pwd;
+
+	if(send(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "send err!" << endl;
+		exit(-1);
+	}else{
+		cout << "send ok!" << endl;
+	}
+
+	if(recv(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "recv err!" << endl;
+		exit(-1);
+	}
+
+	if(strncmp(sd.buf,"OK",2) == 0){
+		return 1;
+	}
+
+	return 0;
+}
+
+/*
+ * function:   登陆成功后的菜单 
+ * @param [ in] 无
+ * @param [out] 无
+ * @return      0
+ */
+int NET::Q_staff(void){
+//	printf("%s\n",__FUNCTION__);
+	sd.type = INQUIRE;
+
+	cout << "要查询的名字:";
+	cin >> sd.name;
+
+	if(send(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "send err!" << endl;
+		exit(-1);
+	}else{
+		cout << "send ok!" << endl;
+	}
+
+	if(recv(fd,&sd,sizeof(sd), 0) == -1){
+		cout << "recv err!" << endl;
+		exit(-1);
+	}
+
+	cout << sd.buf << endl;
+
+	return 0;
+
+}
+
+
+/*
+ * function:    修改员工信息  
+ * @param [ in] 无
+ * @param [out] 无
+ * @return      0
+ */
+int NET::C_staff(void){
+//	printf("%s\n",__FUNCTION__);
+
+	cout << "要修改的信息,以id为准" << endl;
+	cout << "请先查询此员工的id号" << endl;
+
+
+
+
+
+	return 0;
+
+}
+
+
+/*
+ * function:    解析员工操作
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+int NET::anal_staff(void){
+
+	return 0;
+
+}
+
+
+#if 0
+
+/**************************/
 /*
  * function:    
  * @param [ in] 
  * @param [out] 
  * @return      
  */
-#if 0
 int ST::del_staff(void){
 	sd.type = D;
 
@@ -225,7 +408,6 @@ int ST::del_staff(void){
 
 	return 0;
 }
-#endif
 /*
  * function:    修改员工信息
  * @param [ in] 
@@ -275,80 +457,13 @@ int NET::change_staff(void){
 	return 0;
 } 
 
-/*
- * function:    解析员工操作
- * @param [ in] 
- * @param [out] 
- * @return      
- */
-int NET::anal_staff(void){
-	switch(sd.type){
-	case R:
-		NET::R_staff();
-		break;
-	case L:
-		NET::L_staff();
-		break;
-	case Q:
-		NET::Q_staff();
-		break;
-	case H:
-		NET::H_staff();
-		break;
-	case C:
-		NET::C_staff();
-		break;
-	}
-
-	return 0;
-
-}
-
-/*
- * function:    
- * @param [ in] 
- * @param [out] 
- * @return      
- */
-/*注意事项：应该与合作者沟通在那个函数封装命令*/
-int NET::R_staff(void){
-	printf("%s\n",__FUNCTION__);
-	sprintf(sql,"insert into st(name, passwd,sex,age,phone,addr,menoy) \
-			values('%s','%s', %s', '%d, '%s', '%s', %d );",sd.name, sd.passwd,\
-			sd.sex, sd.age, sd.phone, sd.addr, sd.menoy);
-
-	/*此处调用数据库接口，或者在自己写一个方法*/
-
-	return 0;
-}
-
-/*
- * function:    
- * @param [ in] 
- * @param [out] 
- * @return      
- */
-int NET::L_staff(void){
-	printf("%s\n",__FUNCTION__);
 
 
 
-	return 0;
-}
-
-/*
- * function:    
- * @param [ in] 
- * @param [out] 
- * @return      
- */
-int NET::Q_staff(void){
-	printf("%s\n",__FUNCTION__);
 
 
-	return 0;
 
-}
+
 
 /*
  * function:    
@@ -363,19 +478,5 @@ int NET::H_staff(void){
 	return 0;
 
 }
-
-/*
- * function:    
- * @param [ in] 
- * @param [out] 
- * @return      
- */
-int NET::C_staff(void){
-	printf("%s\n",__FUNCTION__);
-
-
-	return 0;
-
-}
-
+#endif 
 #endif
