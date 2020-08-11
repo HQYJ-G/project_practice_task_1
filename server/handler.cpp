@@ -10,7 +10,6 @@
 
 
 #include"handler.h"
-#include"../protocol.h"
 #include"../sql/sqlite.h"
 #include<string.h>
 #include "../tcp/tcp.h"
@@ -50,6 +49,7 @@ int cHandler::CreateTabe(void)
     sql->CreateTable("Info"," ID INTEGER PRIMARY KEY   AUTOINCREMENT,Name TEXT NOT NULL,Age INT ,Gender TEXT,TEL TEXT, Wage INT, Auth TEXT, Pwd TEXT");
     sql->CreateTable("Attend","ID INTEGER, Name Text, Time Text");
     sql->CreateTable("Log","ID INTEGER, Name Text,Time Text,Spoor Text");
+    return 0;
 }
 
 /*
@@ -181,65 +181,21 @@ int cHandler::SelectName(string Table,string Name)
 */
 int cHandler::ClientHandler()
 {
-    sBufType Temp;
+
 
     switch (Msg->type)
     {
         case LOGIN:
-            if (SelectInfoName(Msg->name) == -1)
-            {
-               strcpy(Msg->buf,"Failed");
-               return -1;
-            }
-
-            do
-            {
-                sql->QueueOut(Temp);
-                if (Temp.num == 0)
-                {
-                     strcpy(Msg->buf,"Failed");
-                     return -1;
-                }
-                if (Temp.key == "Auth")
-                {
-
-                    if (strncmp("USER",Temp.val.c_str(),4))
-                    {
-                        if (Msg->authority == ROOT)
-                        {
-                            strcpy(Msg->buf,"Failed");
-                           return -1;
-                        }
-                    }
-                }
-            }while(Temp.key != "Pwd");
-
-            sql->CleanBuf();
-
-            if (Temp.val == Msg->pwd)
-            {
-                strcpy(Msg->buf,"OK");   
-            }else
-            {
-                strcpy(Msg->buf,"Failed");
-            }
+            Login();
             return 0;
-
         case REGISTER:
-            if (AddNewUser(Msg->name,"0","0","0","0","0",Msg->pwd))
-            {
-                memset(Msg,0,sizeof(sPrtcls));
-                strcpy(Msg->buf,"Failed");
-                return -1;
-            }
-            memset(Msg,0,sizeof(sPrtcls));
-            strcpy(Msg->buf,"OK");
+            Register();
             return 0;
         case INQUIRE:
  //       strcpy(Msg->buf,"aaaaaa");
            Inquire();
             return 0;
-        case UPDATE:
+        case UPDATA:
 
             break;
         default:
@@ -250,6 +206,89 @@ int cHandler::ClientHandler()
     return 0;
 };
 
+/*
+  *名称：      Login
+  *功能：      处理登录信息；
+  * 参数：     无
+  * 返回值： 无
+*/
+void cHandler::Login()
+{
+    sBufType Temp;
+
+    if (SelectInfoName(Msg->name) == -1)
+    {
+       strcpy(Msg->buf,"Failed");
+       return ;
+    }
+
+    do
+    {
+        sql->QueueOut(Temp);
+        if (Temp.num == 0)
+        {
+             strcpy(Msg->buf,"Failed");
+             return ;
+        }
+        if (Temp.key == "Auth")
+        {
+
+            if (strncmp("USER",Temp.val.c_str(),4))
+            {
+                if (Msg->authority == ROOT)
+                {
+                    strcpy(Msg->buf,"Failed");
+                   return ;
+                }
+            }
+        }
+    }while(Temp.key != "Pwd");
+
+    sql->CleanBuf();
+
+    if (Temp.val == Msg->pwd)
+    {
+        strcpy(Msg->buf,"OK");
+    }else
+    {
+        strcpy(Msg->buf,"Failed");
+    }
+}
+
+/*
+  *名称：      Register
+  *功能：      注册信息处理；
+  * 参数：     无
+  * 返回值： 无
+*/
+
+void cHandler::Register()
+{
+    string Name;
+    string Pwd;
+    string Gender;
+    string Wage;
+    string Age;
+    string Tel;
+
+    cUnPack::RegisterUnPack(*Msg,Name,Pwd,Gender,Wage,Age,Tel);
+    if (AddNewUser(Name,Age,Gender,Tel,Wage,"USER",Pwd))
+    {
+        memset(Msg,0,sizeof(sPrtcls));
+        strcpy(Msg->buf,"Failed");
+        return ;
+    }
+    memset(Msg,0,sizeof(sPrtcls));
+    strcpy(Msg->buf,"OK");
+    return ;
+}
+
+/*
+  *名称：      Inquire
+  *功能：      查询信息处理；
+  * 参数：     无
+  * 返回值： 无
+*/
 void cHandler::Inquire()
 {
     string temp;
@@ -270,11 +309,12 @@ void cHandler::Inquire()
      }
 
     temp3.clear();
-    while(!sql->Buf.empty())
+    while(!sql->Buf.empty()) //出队信息打包到BUF
     {
 
         sql->QueueOut(temp4);
         temp3 += temp4.val+"|";
+     //   temp3 += (temp4.key+":"+temp4.val+"\n");
     }
     cout<<temp3<<endl;
     strncpy(Msg->buf,temp3.c_str(),temp3.size());

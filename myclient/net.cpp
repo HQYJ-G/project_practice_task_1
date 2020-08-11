@@ -361,9 +361,12 @@ int NET::Q_staff(void){
 		if(sd.authority == ROOT){
 			cout << "要查询的名字:";
 			cin >> sd.name;
+		}else
+		{
+			cout<<"请输出要查询的信息info log attend:";
+			cin >> sd.buf;
 		}
 
-		cin >> sd.buf;
 		if(send(fd,&sd,sizeof(sd), 0) == -1){
 			cout << "send err!" << endl;
 			exit(-1);

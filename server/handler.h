@@ -16,6 +16,15 @@
 #include"../sql/sqlite.h"
 #include"../tcp/tcp.h"
 
+typedef struct
+{
+    string ID;
+    string Name;
+    string Auth;
+    int fd;
+    string ip;
+}sOnlineInfo;
+
 class cHandler
 {
     private:
@@ -43,6 +52,9 @@ class cHandler
         int ClientHandler();
         void CharHandler(string Msg,string &a,string &b);
         void Inquire();
+        void Login();
+        void Register();
+        void test();
 
 };
 

@@ -24,11 +24,12 @@ const int BUF_MAX = 256;
 
 typedef enum
 {
-    LOGIN = 0,//登录
+    DISCONNECT = 0,
+    LOGIN = 1,//登录
     REGISTER,//注册
     INQUIRE,//查询
-    UPDATE,//修改权限
-
+    UPDATA,//修改权限
+    CONNECT,//连接标志
 }eCmdType;
 
 typedef enum
@@ -53,13 +54,53 @@ typedef struct
 }sPrtcls;
 
 
-class MsgHandler
+typedef struct
 {
-	private:
-		queue<struct ServerToClient> data;
-	public:
-		
+    char gender[6];//性别
+    char age[4];//年龄
+    char Tel[12];//电话
+    char wage[8];//工资
+}sPersonel;
 
+typedef struct
+{
+    char table[16];
+    char name[16];
+    char id[16];
+}sInquir;
+
+typedef struct
+{
+    char key[16];
+    char val[32];
+    char id[16];
+}sUpdata;
+
+inline size_t MIN(size_t a,size_t b)
+{
+    return  a<b?a:b;
 };
+
+class cPack
+{
+    private:
+
+    public:
+        static void LoginPack(sPrtcls &Msg, string Name,string Pwd);
+        static void RegisterPack(sPrtcls &Msg, string Name,string Pwd,string Gender,string Wage, string Age,string Tel);
+        static void InquirePack(sPrtcls &Msg,string table,string Name,string ID);
+        static void UpdataPack(sPrtcls &Msg,string ID,string key,string val);
+};
+
+class cUnPack
+{
+
+    public:
+        static void LoginUnPack(sPrtcls &Msg, string &Name,string &Pwd);
+        static void RegisterUnPack(sPrtcls &Msg, string &Name,string &Pwd,string &Gender,string &Wage, string &Age,string &Tel);
+        static void InquireUnPack(sPrtcls &Msg,string &table,string &Name,string &ID);
+        static void UpdataUnPack(sPrtcls &Msg,string &ID,string &key,string &val);
+};
+
 
 #endif

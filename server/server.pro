@@ -21,7 +21,8 @@ TEMPLATE = app
 SOURCES += main.cpp \
     ../sql/sqlite.cpp \
     handler.cpp \
-    ../tcp/tcp.cpp
+    ../tcp/tcp.cpp \
+    ../protocol.cpp
 
 HEADERS += \
     ../sql/sqlite.h \
