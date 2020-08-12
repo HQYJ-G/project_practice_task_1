@@ -50,6 +50,7 @@ class cMyTcp{
         void WaitClient();
         void SendMsg(sPrtcls *Buf, size_t len);
         void RecvMsg(sPrtcls *Buf, size_t len);
+        void CloseNow();
 };
 
 #endif // TCP_H

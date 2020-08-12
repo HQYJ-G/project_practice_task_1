@@ -76,16 +76,19 @@
      socklen_t l = sizeof(struct sockaddr_in);
      cout<<"wait client connect"<<endl;
 
-     poll(Pollfd,PollNum,-1);
+     poll(Pollfd,ClientNum,-1);
 
      if (Pollfd[0].revents == POLLIN)
      {
+         /*添加新连接到监控表*/
         Pollfd[ClientNum].fd = accept(fd,(struct sockaddr *)&tSin,&l);
         Pollfd[ClientNum].events = POLLIN;
+
+        /*记录连接的信息*/
         NewClient.fd = Pollfd[ClientNum].fd;
         NewClient.port = ntohs(tSin.sin_port);
         inet_ntop(AF_INET, (void *)&tSin.sin_addr, NewClient.ip, sizeof(NewClient.ip));
-        cout<<NewClient.ip<<":"<<NewClient.port<<endl;
+        cout<<NewClient.ip<<":"<<NewClient.port<<":"<<NewClient.fd<<endl;
         ClientNum++;
      }
 
@@ -100,9 +103,13 @@
  */
  void cMyTcp::SendMsg(sPrtcls *Buf, size_t len)
  {
-    if (send(cfd,Buf,len,0) == -1)
-    {
-        cout<<"send failed"<<endl;
+     if(!((Buf->type==DISCONNECT) |(Buf->type == CONNECT)))
+     {
+        if (send(cfd,Buf,len,0) == -1)
+        {
+             cout<<"send failed"<<endl;
+         }
+        cout<<"send ok"<<endl;
      }
  }
 
@@ -117,7 +124,7 @@
     int i;
 //    char a[256] ={};
 
-     for(i = 1;i<PollNum;i++)
+     for(i = 1;i<ClientNum;i++)
      {
         if(Pollfd[i].revents == POLLIN)
         {
@@ -136,4 +143,27 @@
      }
  }
 
+ /*
+   *名称：      CloseNow
+   *功能：      清除刚刚接受过数据的fd;
+   * 参数：     无
+   * 返回值： 无
+ */
+void cMyTcp::CloseNow()
+{
+    int i;
+    for(i=0;i<ClientNum;i++)
+    {
+
+        if(cfd == Pollfd[i].fd)
+        {
+            Pollfd[i].fd = Pollfd[ClientNum-1].fd;
+            ClientNum--;
+//       Pollfd[ClientNum].fd = 0;
+            close(cfd);
+            cout<<"close"<<cfd<<endl;
+            break;
+        }
+    }
+}
 

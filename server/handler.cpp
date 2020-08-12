@@ -185,17 +185,23 @@ int cHandler::ClientHandler()
 
     switch (Msg->type)
     {
+        case DISCONNECT:
+            Tcp->CloseNow();
+            break;
         case LOGIN:
             Login();
-            return 0;
+            break;
         case REGISTER:
             Register();
-            return 0;
+            break;
         case INQUIRE:
  //       strcpy(Msg->buf,"aaaaaa");
            Inquire();
-            return 0;
+           break;
         case UPDATA:
+
+            break;
+        case CONNECT:
 
             break;
         default:

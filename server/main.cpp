@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
         memset(&Msg,0,sizeof(sPrtcls));
         MyTcp.RecvMsg(&Msg,sizeof(sPrtcls));
 //        printf("%d\n",Msg.type);
-//        h.ClientHandler();
+        h.ClientHandler();
         cout<<"处理完成"<<endl;
-   //     MyTcp.SendMsg(&Msg,sizeof(sPrtcls));
+        MyTcp.SendMsg(&Msg,sizeof(sPrtcls));
         sleep(1);
     }
 

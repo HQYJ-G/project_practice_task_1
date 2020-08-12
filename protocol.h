@@ -24,7 +24,7 @@ const int BUF_MAX = 256;
 
 typedef enum
 {
-    DISCONNECT = 0,
+    DISCONNECT = 0,//断开标志
     LOGIN = 1,//登录
     REGISTER,//注册
     INQUIRE,//查询

@@ -22,11 +22,12 @@ const unsigned int BUF_MAX = 256;
 
 typedef enum
 {
-    LOGIN = 0,//登录
+	DISCONNECT = 0,
+    LOGIN ,//登录
     REGISTER,//注册
     INQUIRE,//查询
 	CHANGE,//修改
-
+	CONNECT,
 }eCmdType;
 
 typedef enum

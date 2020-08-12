@@ -55,6 +55,13 @@ void cPack::RegisterPack(sPrtcls &Msg, string Name,string Pwd,string Gender,stri
 
 }
 
+/*
+  *名称：      InquirePack
+  *功能：      查询信息打包
+  * 参数：     输出:sPrtcls &Msg
+  *                  输入: string table,string Name,string ID
+  * 返回值： 无
+*/
 void InquirePack(sPrtcls &Msg,string table,string Name,string ID)
 {
     sInquir temp;
@@ -71,6 +78,13 @@ void InquirePack(sPrtcls &Msg,string table,string Name,string ID)
     memcpy(Msg.buf,&temp,sizeof(sInquir));
 };
 
+/*
+  *名称：      InquirePack
+  *功能：      修改信息打包
+  * 参数：     输出:sPrtcls &Msg
+  *                  输入: string ID,string key,string val
+  * 返回值： 无
+*/
 void UpdataPack(sPrtcls &Msg,string ID,string key,string val)
 {
     sUpdata temp;
@@ -121,6 +135,13 @@ void cUnPack::RegisterUnPack(sPrtcls &Msg, string &Name,string &Pwd,string &Gend
     Tel = temp.Tel;
 }
 
+/*
+  *名称：      InquireUnPack
+  *功能：      查询信息解包
+  * 参数：     输出:string &table,string &Name,string &ID
+  *                  输入: sPrtcls &Msg,
+  * 返回值： 无
+*/
 void cUnPack::InquireUnPack(sPrtcls &Msg,string &table,string &Name,string &ID)
 {
     sInquir temp;
@@ -133,6 +154,13 @@ void cUnPack::InquireUnPack(sPrtcls &Msg,string &table,string &Name,string &ID)
 
 }
 
+/*
+  *名称：       UpdataUnPack
+  *功能：      修改信息解包
+  * 参数：     输出:string &ID,string &key,string &val
+  *                  输入: sPrtcls &Msg,
+  * 返回值： 无
+*/
 void cUnPack::UpdataUnPack(sPrtcls &Msg,string &ID,string &key,string &val)
 {
     sUpdata temp;
