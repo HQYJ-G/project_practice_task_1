@@ -49,6 +49,7 @@ int cHandler::CreateTabe(void)
     sql->CreateTable("Info"," ID INTEGER PRIMARY KEY   AUTOINCREMENT,Name TEXT NOT NULL,Age INT ,Gender TEXT,TEL TEXT, Wage INT, Auth TEXT, Pwd TEXT");
     sql->CreateTable("Attend","ID INTEGER, Name Text, Time Text");
     sql->CreateTable("Log","ID INTEGER, Name Text,Time Text,Spoor Text");
+    AddNewUser("root","0","0","0","0","ROOT","root");
     return 0;
 }
 
@@ -174,6 +175,22 @@ int cHandler::SelectName(string Table,string Name)
 }
 
 /*
+  *名称：      UpDataID
+  *功能：      根据ID修改数据；
+  * 参数：
+  * 返回值： 无
+*/
+int cHandler::UpDataID(string table,string ID,string key,string val)
+{
+    string temp;
+    string temp2;
+
+    temp = "ID="+ID;
+    temp2 = key + "=" + val;
+
+    return sql->Updata(table,temp,temp2);
+}
+/*
   *名称：      ClientHandler
   *功能：      处理客户端消息；
   * 参数：
@@ -186,23 +203,36 @@ int cHandler::ClientHandler()
     switch (Msg->type)
     {
         case DISCONNECT:
-            Tcp->CloseNow();
+            DisConnect();
+            cout<<"DisConnetc"<<endl;
             break;
         case LOGIN:
             Login();
+            /*
+            cout<<"Name"<<ClientInfo[Tcp->Getcfd()].Name<<endl;
+            cout<<"ID"<<ClientInfo[Tcp->Getcfd()].ID<<endl;
+            cout<<"Auth"<<ClientInfo[Tcp->Getcfd()].Auth<<endl;
+            cout<<"fd"<<ClientInfo[Tcp->Getcfd()].fd<<endl;
+            cout<<"ip"<<ClientInfo[Tcp->Getcfd()].ip<<endl;
+            cout<<"port"<<ClientInfo[Tcp->Getcfd()].port<<endl;
+            */
             break;
         case REGISTER:
             Register();
+            cout<<"Register"<<endl;
             break;
         case INQUIRE:
  //       strcpy(Msg->buf,"aaaaaa");
+            cout<<"Inquire"<<endl;
            Inquire();
            break;
         case UPDATA:
-
+            UpData();
+            cout<<"DisConnetc"<<endl;
             break;
         case CONNECT:
-
+            cout<<"Connetc"<<endl;
+            Connect();
             break;
         default:
 
@@ -212,6 +242,16 @@ int cHandler::ClientHandler()
     return 0;
 };
 
+void cHandler::DisConnect()
+{
+    ClientInfo[Tcp->Getcfd()].Name.clear();
+    ClientInfo[Tcp->Getcfd()].ID.clear();
+    ClientInfo[Tcp->Getcfd()].ip.clear();
+    ClientInfo[Tcp->Getcfd()].Auth=USER;
+    ClientInfo[Tcp->Getcfd()].port = 0;
+    ClientInfo[Tcp->Getcfd()].fd = 0;
+    Tcp->CloseNow();
+}
 /*
   *名称：      Login
   *功能：      处理登录信息；
@@ -222,11 +262,15 @@ void cHandler::Login()
 {
     sBufType Temp;
 
+    sql->CleanBuf();
     if (SelectInfoName(Msg->name) == -1)
     {
        strcpy(Msg->buf,"Failed");
        return ;
     }
+    ClientInfo[Tcp->Getcfd()].Name = Msg->name;
+
+ //   ClientInfo[Tcp->Getcfd()].Name.assign(Msg->name);
 
     do
     {
@@ -236,9 +280,23 @@ void cHandler::Login()
              strcpy(Msg->buf,"Failed");
              return ;
         }
+        cout<<Temp.key<<endl;
+        if (Temp.key == "ID")
+        {
+            ClientInfo[Tcp->Getcfd()].ID = Temp.val;
+        }
+
         if (Temp.key == "Auth")
         {
 
+            if (Temp.val == "ROOT")
+            {
+                ClientInfo[Tcp->Getcfd()].Auth = ROOT;
+            }else
+            {
+                ClientInfo[Tcp->Getcfd()].Auth = USER;
+            }
+            /*
             if (strncmp("USER",Temp.val.c_str(),4))
             {
                 if (Msg->authority == ROOT)
@@ -246,7 +304,7 @@ void cHandler::Login()
                     strcpy(Msg->buf,"Failed");
                    return ;
                 }
-            }
+            }*/
         }
     }while(Temp.key != "Pwd");
 
@@ -254,6 +312,7 @@ void cHandler::Login()
 
     if (Temp.val == Msg->pwd)
     {
+        Msg->authority = ClientInfo[Tcp->Getcfd()].Auth;
         strcpy(Msg->buf,"OK");
     }else
     {
@@ -278,13 +337,11 @@ void cHandler::Register()
     string Tel;
 
     cUnPack::RegisterUnPack(*Msg,Name,Pwd,Gender,Wage,Age,Tel);
-    if (AddNewUser(Name,Age,Gender,Tel,Wage,"USER",Pwd))
+    if (AddNewUser(Name,Age,Gender,Tel,Wage,"USER",Pwd) == -1)
     {
-        memset(Msg,0,sizeof(sPrtcls));
         strcpy(Msg->buf,"Failed");
         return ;
     }
-    memset(Msg,0,sizeof(sPrtcls));
     strcpy(Msg->buf,"OK");
     return ;
 }
@@ -300,17 +357,21 @@ void cHandler::Inquire()
     string temp;
     string temp2;
     string temp3;
+    string table;
+    string Name;
+    string ID;
     sBufType temp4;
     int i;
-
-    if(Msg->authority == ROOT)
+    sql->CleanBuf();
+    cUnPack::InquireUnPack(*Msg,table,Name,ID);
+    if(ClientInfo[Tcp->Getcfd()].Auth == ROOT)
     {
-        CharHandler(Msg->buf,temp,temp2);
-       SelectName(temp,temp2);
+//        CharHandler(Msg->buf,temp,temp2);
+       SelectName(table,Name);
         cout<<"ROOT"<<endl;
      }else
     {
-        SelectName(Msg->buf,Msg->name);
+        SelectName(table,ClientInfo[Tcp->Getcfd()].Name);
         cout<<"USER"<<endl;
      }
 
@@ -319,15 +380,23 @@ void cHandler::Inquire()
     {
 
         sql->QueueOut(temp4);
-        temp3 += temp4.val+"|";
-     //   temp3 += (temp4.key+":"+temp4.val+"\n");
+//        temp3 += temp4.val+"|";
+        temp3 += (temp4.key+":"+temp4.val+"\n");
     }
     cout<<temp3<<endl;
-    strncpy(Msg->buf,temp3.c_str(),temp3.size());
+    memset(Msg->buf,0,sizeof(Msg->buf));
+    strncpy(Msg->buf,temp3.c_str(),MIN(temp3.size(),sizeof(Msg->buf)));
+    Msg->authority = ClientInfo[Tcp->Getcfd()].Auth;
 
     return;
 }
 
+/*
+  *名称：      CharHandler
+  *功能：      分割字符串；
+  * 参数：     无
+  * 返回值： 无
+*/
 void cHandler::CharHandler(string Msg,string &a,string &b)
 {
     int Pos1;
@@ -335,4 +404,36 @@ void cHandler::CharHandler(string Msg,string &a,string &b)
     Pos1 = Msg.find(",");
     a = Msg.substr(0,Pos1);
     b = Msg.substr(Pos1+1,Msg.size()-Pos1);
+}
+
+/*
+  *名称：      UpData
+  *功能：      修改数据；
+  * 参数：     无
+  * 返回值： 无
+*/
+void cHandler::UpData()
+{
+    string ID;
+    string key;
+    string val;
+
+    cUnPack::UpdataUnPack(*Msg,ID,key,val);
+
+    if (UpDataID("info",ID,key,val) == -1)
+    {
+        strcpy(Msg->buf,"Failed");
+        return;
+    }
+    strcpy(Msg->buf,"OK");
+    Msg->authority = ClientInfo[Tcp->Getcfd()].Auth;
+}
+
+void cHandler::Connect()
+{
+
+    ClientInfo[Tcp->NewClient.fd].ip = Tcp->NewClient.ip;
+    ClientInfo[Tcp->NewClient.fd].fd = Tcp->NewClient.fd;
+    ClientInfo[Tcp->NewClient.fd].port = Tcp->NewClient.port;
+    cout<<"Connect ok"<<endl;
 }

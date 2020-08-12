@@ -106,7 +106,7 @@ class NET{
 		int L_staff(void);
 		int Q_staff(void);
 		int C_staff(void);
-
+		int ROOTSubMenu(void);
 #if 0
 		int H_staff(void);
 #endif 

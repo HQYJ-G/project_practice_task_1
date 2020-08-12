@@ -9,7 +9,7 @@
  ******************************************************************************/
 
 #include "net.h"
-
+#include"../protocol.h"
 using namespace std;
 
 /*
@@ -167,7 +167,8 @@ int NET::main_interface(void){
 		break;
 	case 2:
 		if(L_staff() == 1){
-			NET::SubMenu();
+				NET::SubMenu();
+
 		}else{
 			cout << "用户名或者密码错误！" << endl;
 			break;
@@ -226,42 +227,45 @@ int NET::SubMenu(void){
 int NET::R_staff(void){
 
 	bzero(&sd, sizeof(sd));
-	sd.type = REGISTER;
-	sd.authority = USER;
+    string Name;
+    string Pwd;
+    string Gender;
+    string Wage;
+    string Age;
+    string Tel;
 
 
 	printf("please name:");
-	scanf("%s",sd.name);
+    cin >>Name;
 	getchar();
 
 	printf("please passwd:");
-	scanf("%s",sd.pwd);
+    cin >>Pwd;
 	getchar();
 #if 1
 	printf("please sex(W/M):");
-	scanf("%s",sd.sex);
+    cin >>Gender;
 	getchar();
 
-	printf("please age:");
-	scanf("%d",&sd.age);
+    printf("please wage:");
+    cin >>Wage;
 	getchar();
 
-	printf("please phone:");
-	scanf("%s",sd.phone);
+    printf("please age:");
+    cin >>Age;
 	getchar();
 
 
-	printf("please menoy:");
-	scanf("%d",&sd.menoy);
+    printf("please tel:");
+    cin >>Tel;
 	getchar();
 
-	sprintf(sd.buf,"%s,%s,%s,%d,%s,%d\n",sd.name, sd.pwd, sd.sex, sd.age,\
-			sd.phone, sd.menoy);
+    cPack::RegisterPack(sd,Name,Pwd,Gender,Wage,Age,Tel);
+
 
 #endif
-	printf("%s,%s,%s,%d,%s,%d\n",sd.name, sd.pwd, sd.sex, sd.age,\
-			sd.phone, sd.menoy);
 
+//    sd.type = REGISTER;
 
 	if(send(fd,&sd,sizeof(sd), 0) == -1){
 		cout << "send err!" << endl;
@@ -290,6 +294,7 @@ int NET::L_staff(void){
 	sd.type = LOGIN;
 	int n, i = 0;
 
+	/*
 	while(1){
 		cout << "*****************" << endl;
 		cout << "1:普通用户 2:root" << endl;
@@ -314,11 +319,13 @@ int NET::L_staff(void){
 			break;
 		}
 	}
+	
 	if(n == 1){
 		sd.authority = USER;
 	}else{
 		sd.authority = ROOT;
 	}
+	*/
 
 	cout << "名字:";
 	cin >> sd.name ;
@@ -353,19 +360,27 @@ int NET::L_staff(void){
  */
 int NET::Q_staff(void){
 	//	printf("%s\n",__FUNCTION__);
-	sd.type = INQUIRE;
-
+    string table;
+    string Name;
+    string ID("NO");
 	int n = 0,i = 0;
 
 	while(1){
 		if(sd.authority == ROOT){
 			cout << "要查询的名字:";
-			cin >> sd.name;
+            cin >> Name;
+            cout<<"请输出要查询的信息info log attend:";
+            cin >>table;
 		}else
 		{
 			cout<<"请输出要查询的信息info log attend:";
-			cin >> sd.buf;
+            cin >> table;
 		}
+
+        memset(sd.buf,0,sizeof(sd.buf));
+  //      printf("sd type%d\n",sd.type);
+        cPack::InquirePack(sd,table,Name,ID);
+ //       printf("sd type%d\n",sd.type);
 
 		if(send(fd,&sd,sizeof(sd), 0) == -1){
 			cout << "send err!" << endl;
@@ -373,6 +388,7 @@ int NET::Q_staff(void){
 		}else{
 			cout << "send ok!" << endl;
 		}
+
 
 		if(recv(fd,&sd,sizeof(sd), 0) == -1){
 			cout << "recv err!" << endl;
@@ -423,61 +439,25 @@ int NET::Q_staff(void){
 int NET::C_staff(void){
 	//	printf("%s\n",__FUNCTION__);
 	int n;
-
-	sd.type = CHANGE;
+    string ID;
+    string key;
+    string val;
 
 	if(sd.authority == USER){
 		cout << "普通用户没有权限！" << endl;
 		return 0;
 	}
-	cout << "要修改的信息,以id为准" << endl;
-	cout << "请先查询此员工的🆔号" << endl;
-	cout << "查询方式:以名字为目标" << endl;
-	cout << "继续请安1 结束请安2" << endl;
 
-	cin >> n;
+        cout << "输入ID:";
+        cin >> ID;
 
-	if(n == 1){
-		int id;
-		cout << "ID:";
-		cin >> id;
+        cout<<"输入要修改的数据:";
+        cin>>key;
 
-		printf("please name:");
-		scanf("%s",sd.name);
-		getchar();
+        cout<<"请输入修改后的值:";
+        cin>>val;
 
-		printf("please passwd:");
-		scanf("%s",sd.pwd);
-		getchar();
-
-		printf("please sex(M/W):");
-		scanf("%s",sd.sex);
-		getchar();
-
-		printf("please age:");
-		scanf("%d",&sd.age);
-		getchar();
-
-		printf("please phone:");
-		scanf("%s",sd.phone);
-		getchar();
-
-
-		printf("please menoy:");
-		scanf("%d",&sd.menoy);
-		getchar();
-
-		sprintf(sd.buf,"%d,%s,%s,%s,%d,%s,%d\n",id,sd.name, sd.pwd, sd.sex, sd.age,\
-				sd.phone, sd.menoy);
-
-	}
-	else if(n == 2){
-		return 0;
-	}
-	else{
-		cout << "输入错误！" << endl;
-	}
-
+    cPack::UpdataPack(sd,ID,key,val);
 	if(send(fd,&sd,sizeof(sd), 0) == -1){
 		cout << "send err!" << endl;
 	}else{

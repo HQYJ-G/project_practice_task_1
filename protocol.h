@@ -26,10 +26,10 @@ typedef enum
 {
     DISCONNECT = 0,//断开标志
     LOGIN = 1,//登录
-    REGISTER,//注册
-    INQUIRE,//查询
-    UPDATA,//修改权限
-    CONNECT,//连接标志
+    REGISTER = 2,//注册
+    INQUIRE = 3,//查询
+    UPDATA = 4,//修改权限
+    CONNECT= 5,//连接标志
 }eCmdType;
 
 typedef enum

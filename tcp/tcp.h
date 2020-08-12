@@ -41,8 +41,9 @@ class cMyTcp{
         int AddrLen;
         void TcpServer(void);
         struct pollfd Pollfd[PollNum];
-        sClientInfo NewClient;
+
     public:
+        sClientInfo NewClient;
 
         cMyTcp(short port);
         ~cMyTcp();
@@ -51,6 +52,10 @@ class cMyTcp{
         void SendMsg(sPrtcls *Buf, size_t len);
         void RecvMsg(sPrtcls *Buf, size_t len);
         void CloseNow();
+        int Getcfd(){
+ //           cout<<"cfd"<<cfd<<endl;
+            return cfd;
+        };
 };
 
 #endif // TCP_H

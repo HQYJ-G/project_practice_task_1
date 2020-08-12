@@ -28,14 +28,22 @@ int main(int argc, char *argv[])
     cMyTcp MyTcp(11115);
     cHandler h(&sql,&Msg,&MyTcp);
 
- //   h.CreateTabe();
+//    h.CreateTabe();
+    /*
+    string aa,bb,cc;
+    cPack::InquirePack(Msg,"aa","bb","cc");
 
+    cUnPack::InquireUnPack(Msg,aa,bb,cc);
+    cout<<aa<<endl;
+    cout<<bb<<endl;
+    cout<<cc<<endl;*/
     while(1)
     {
         MyTcp.WaitClient();//等待客户端连接
         memset(&Msg,0,sizeof(sPrtcls));
         MyTcp.RecvMsg(&Msg,sizeof(sPrtcls));
-//        printf("%d\n",Msg.type);
+       printf("type%d\n",Msg.type);
+        cout<<"接收完成"<<endl;
         h.ClientHandler();
         cout<<"处理完成"<<endl;
         MyTcp.SendMsg(&Msg,sizeof(sPrtcls));

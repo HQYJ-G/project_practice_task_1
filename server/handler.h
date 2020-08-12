@@ -15,14 +15,15 @@
 #include"../protocol.h"
 #include"../sql/sqlite.h"
 #include"../tcp/tcp.h"
-
+#include<list>
 typedef struct
 {
     string ID;
     string Name;
-    string Auth;
+    eAuthorityType Auth;
     int fd;
     string ip;
+    short port;
 }sOnlineInfo;
 
 class cHandler
@@ -31,6 +32,8 @@ class cHandler
         cSqlite *sql;
         sPrtcls *Msg;
         cMyTcp *Tcp;
+        sOnlineInfo ClientInfo[100];
+
  //       const string quoting = "\"";
     public:
 
@@ -49,12 +52,15 @@ class cHandler
         int SelectAttendName(string Name);
         int SelectLogID(string ID);
         int SelectLogName(string Name);
+        int UpDataID(string table,string ID,string key,string val);
         int ClientHandler();
         void CharHandler(string Msg,string &a,string &b);
+        void DisConnect();
         void Inquire();
         void Login();
         void Register();
-        void test();
+        void UpData();
+        void Connect();
 
 };
 

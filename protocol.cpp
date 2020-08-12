@@ -62,7 +62,7 @@ void cPack::RegisterPack(sPrtcls &Msg, string Name,string Pwd,string Gender,stri
   *                  输入: string table,string Name,string ID
   * 返回值： 无
 */
-void InquirePack(sPrtcls &Msg,string table,string Name,string ID)
+void cPack::InquirePack(sPrtcls &Msg,string table,string Name,string ID)
 {
     sInquir temp;
 
@@ -85,7 +85,7 @@ void InquirePack(sPrtcls &Msg,string table,string Name,string ID)
   *                  输入: string ID,string key,string val
   * 返回值： 无
 */
-void UpdataPack(sPrtcls &Msg,string ID,string key,string val)
+void cPack::UpdataPack(sPrtcls &Msg,string ID,string key,string val)
 {
     sUpdata temp;
 

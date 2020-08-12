@@ -103,6 +103,7 @@
  */
  void cMyTcp::SendMsg(sPrtcls *Buf, size_t len)
  {
+     printf("BUF%d\n",Buf->type);
      if(!((Buf->type==DISCONNECT) |(Buf->type == CONNECT)))
      {
         if (send(cfd,Buf,len,0) == -1)
@@ -161,7 +162,7 @@ void cMyTcp::CloseNow()
             ClientNum--;
 //       Pollfd[ClientNum].fd = 0;
             close(cfd);
-            cout<<"close"<<cfd<<endl;
+//            cout<<"close"<<cfd<<endl;
             break;
         }
     }
